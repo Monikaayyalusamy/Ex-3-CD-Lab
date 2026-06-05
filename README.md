@@ -15,37 +15,64 @@ To write a yacc program to recognize a valid arithmetic expression that uses ope
 # PROGRAM
 ```python
 %{
-#include "exp30102.tab.h"
 #include <stdio.h>
+#include <stdlib.h>
+
+int yylex();
+void yyerror(const char *s);
+
+int valid = 1;
 %}
 
-%%
-
-[0-9]+                  { return NUMBER; }
-[a-zA-Z][a-zA-Z0-9]*    { return ID; }
-
-"+"     { return '+'; }
-"-"     { return '-'; }
-"*"     { return '*'; }
-"/"     { return '/'; }
-"("     { return '('; }
-")"     { return ')'; }
-
-[ \t]   ;          /* ignore spaces */
-\n      return 0;
-
-.       return yytext[0];
+%token NUMBER ID
 
 %%
 
-int yywrap()
+statement:
+        expr
+        {
+            if(valid)
+                printf("\nValid Arithmetic Expression\n");
+        }
+        ;
+
+expr:
+        expr '+' term
+      | expr '-' term
+      | term
+      ;
+
+term:
+        term '*' factor
+      | term '/' factor
+      | factor
+      ;
+
+factor:
+        '(' expr ')'
+      | NUMBER
+      | ID
+      ;
+
+%%
+
+int main()
 {
-    return 1;
+    printf("Enter Expression:\n");
+    yyparse();
+    return 0;
+}
+
+void yyerror(const char *s)
+{
+    valid = 0;
+    printf("\nInvalid Arithmetic Expression\n");
 }
 ```
 
 # OUTPUT
-<img width="1544" height="972" alt="image" src="https://github.com/user-attachments/assets/59d0d3c4-0d76-493b-a087-a9bdf33af676" />
+
+<img width="1472" height="737" alt="WhatsApp Image 2026-06-05 at 6 57 48 PM" src="https://github.com/user-attachments/assets/3dc008f5-cfa1-4478-b1c5-9874b2951a01" />
 
 # RESULT
 A YACC program to recognize a valid arithmetic expression that uses operator +,-,* and / is executed successfully and the output is verified.
